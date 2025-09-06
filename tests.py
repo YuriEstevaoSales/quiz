@@ -121,3 +121,34 @@ def test_if_generated_choices_ids_are_sequential():
     question.add_choice('d', False)
     choice = question.choices[2]
     assert choice.id == 4
+
+@pytest.fixture
+def question_with_multiple_choices():
+    question = Question(title='q1', max_selections=2)
+
+    question.add_choice('a', False)
+    question.add_choice('b', False)
+    question.add_choice('c', False)
+    question.add_choice('d', False)
+
+    return question
+
+def test_change_max_selections_at_runtime(question_with_multiple_choices):
+    question = question_with_multiple_choices
+    
+    question.set_correct_choices([1, 3])
+    correct_choices = [1, 3]
+    assert question.correct_selected_choices(correct_choices) == correct_choices
+
+    question.max_selections = 1 
+
+    with pytest.raises(Exception):
+        question.correct_selected_choices([1, 3])
+
+def test_correct_selected_choices_without_correct_choices(question_with_multiple_choices):
+    question = question_with_multiple_choices
+
+    assert question.correct_selected_choices([]) == []
+
+    selected = [1, 3]
+    assert question.correct_selected_choices(selected) == []
